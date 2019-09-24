@@ -208,3 +208,144 @@ git push -u origin master
 We have created our own [Webpack](https://webpack.js.org/), [Babel](https://babeljs.io/) & [React]([https://reactjs.org](https://reactjs.org/)) build without using something like Create React App ([CRA](https://github.com/facebook/create-react-app)). We have gone through all the steps for setting up our build toolchain. I prefer this rather than spinning up Create React App for most projects. [CRA](https://github.com/facebook/create-react-app) is a great tool and is amazing to use for demos, hashing out new ideas or components quickly, but I wanted you to walk away with something that you can turn into a production application eventually as well understand how to build your own build chain with only the packages and dependencies were need. At this point, we know everything that is in our `package.json` and why it's there. I have provided links along the way if you want to dive deeper into each one.
 
 We can now proceed with building out our custom React application. Along the way, we will install new dependencies only as we need them.
+
+## Getting Started with ESLint
+
+We need to install and initialize ESLint. All the steps I'm about to perform and more info [can be found here](https://eslint.org/docs/user-guide/getting-started). But I have modified those instructions to make sure we have everything we need to make ESLint work with React as we need additional packages for our Webpack/Babel/React build.
+
+```bash
+npm i --save-dev eslint babel-eslint eslint-watch eslint-plugin-react
+```
+
+Next, we need a `.eslintrc` file which will serve as our configuration, let's create a file in the root directory of our project and add the following contents to it:
+
+```json
+{
+  "plugins": [
+    "react"
+  ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "extends": [],
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"]
+  },
+  "settings": {
+    "react": {
+      "version": "16.9"
+    }
+  }
+}
+```
+
+This is as close to the default `.eslintrc` file that is put in new projects when running ESLint's initialization command, but we have slightly modified it to work with our Webpack/Babel/React project.
+
+Before we can run our linter, we need to add a `lint` and `lint:fix` script to our `package.json` just above the test script:
+
+```json
+    "lint": "eslint app --ext .js,.jsx",
+    "lint:fix": "eslint --fix app --ext .js,.jsx",
+```
+
+Again, they are made to work specifically with React hence the `.js` and `.jsx` file extensions. Now let's run our linter.
+
+```bash
+npm run lint
+```
+
+Right away we get some errors, this is great, it means our linter is working. But as a team, let's assume that we do not want to follow the double quote rule and we only want to follow the semi-colon rule. Let's make the following changes to the `.eslintrc` file:
+
+```json
+    "semi": ["warn", "always"],
+    "quotes": ["off", "double"]
+```
+
+When you get nothing back from the linter, you know that you have no errors and warnings. We can turn off the quotes rule as shown above or completely remove it, I'm going to opt for removing it. If you would like to test the linter one more time, try removing some semi-colons and running it again.
+
+### Adding linting for React Hooks
+
+Some rules that we may want to apply are not built into ESLint because they are framework specific. If we want to apply the suggested rules for using Hooks, we need to add a new package that can be used as a plugin, we already have one plugin added and set up for JSX, but let's show how to add another one.
+
+Let's install the package we need:
+
+```bash
+npm i --save-dev eslint-plugin-react-hooks
+```
+First we will add `react-hooks` to the plugin section the `.eslintrc` file:
+
+```json
+    "react",
+    "react-hooks"
+```
+
+then, we will add the rule to the rules section the `.eslintrc` file:
+
+```json
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+```
+
+To check the plugin is working, replace the first line in `App.js` with:
+
+```jsx
+import React, { useEffect } from 'react';
+useEffect(() => {
+  console.log("This should trigger our Hooks rule");
+});
+```
+
+Run our linter again and you should get a warning:
+
+```bash
+7:3  error  React Hook "useEffect" cannot be called at the top level...
+```
+
+Change the code in `App.js` back to the way it was (discard changes in git). We will surely run into more Hooks warnings and errors as we get further into the course.
+
+To use our `react` plugin, we can look at the [docs here]() and see that we could use a rule for no duplicate props:
+
+```json
+  "rules": {
+    "react/jsx-no-duplicate-props": "error"
+  },
+```
+
+We could then go into our `index.js` file and add some duplicate props to see it in action:
+
+```jsx
+ReactDOM.render(<App isTrue={true} isTrue={false} />, document.getElementById("root"));
+```
+
+And we get the following error:
+
+```bash
+6:36  error  No duplicate props allowed...
+```
+
+Feel free to remove that one if you like, but at least we know how to browse the rules now and apply them!
+
+Something to be aware of is the React version in your `.eslintrc` file, ensure that it matches the version of React you have installed:
+
+```json
+ "settings": {
+    "react": {
+      "version": "16.9"
+    }
+  }
+```
+
+Finally, we could set up linting to run on build or start script, or add a VS Code plugin to give us hints while we code. I'll leave exploring that up to you!
+
+This concludes the linting section of the workshop, you now have the tools so you and your team can determine what plugins and rules you want to use!
