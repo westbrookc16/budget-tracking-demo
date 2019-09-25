@@ -349,3 +349,449 @@ Something to be aware of is the React version in your `.eslintrc` file, ensure t
 Finally, we could set up linting to run on build or start script, or add a VS Code plugin to give us hints while we code. I'll leave exploring that up to you!
 
 This concludes the linting section of the workshop, you now have the tools so you and your team can determine what plugins and rules you want to use!
+
+## Creating a Semantic and Responsive Frame
+
+We want to create a frame for our application to live in. Also, we know that we are going to use KendoReact components and icons in our app, so before we get too far, lets add the package and style we need for that.
+
+```bash
+npm i @progress/kendo-theme-material
+```
+
+That package gives us a stylesheet we can use and we need to put it into the `App.js` file, right between our `normalize.css` import and our `App.scss` imports. The order is important, we want our `App.scss` to override it if needed:
+
+```jsx
+import 'normalize.css';
+import '@progress/kendo-theme-material/dist/all.css';
+import './App.scss';
+```
+
+We need a component `Frame.js`. It's going to contain the shell of our application consisting of an outer `div` tag called `app-container` and inside of that, a semantic HTML structure:
+
+```jsx
+<div className={`app-container`}>
+  <main>
+    <header></header>
+    <section></section>
+    <footer></footer>
+  </main>
+</div>
+```
+
+The `<main>` contains header, section and footer semantic tags and a `Sidenav`.
+The `<header>` will contain a `Logo` and `Topnav` component.
+The `<section>` will be used to load our React Router and it's routing.
+The `<footer>` will contain one component called `Footer`.
+
+We can see the semantic tags mixed with our React Components below:
+
+```jsx
+<div className={`app-container`}>
+  <main>
+    <header>
+      <Logo />
+      <Topnav />
+    </header>
+    <section>
+      {/* Routes Load Here */}
+    </section>
+    <footer>
+      <Foot />
+    </footer>
+  </main>
+  <Sidenav />
+</div>
+```
+
+We will use a combination of Flexbox and CSS Grid styles in conjunction with these semantic HTML tags to create a solid layout. Before we add those styles, let's get the files we need set up, and the navigation working and switching routes.
+
+### The Frame
+
+Create a new file in the `app` directory called `Frame.js`.
+
+### Create Sub-Directories For Components
+
+Inside `app` directory, create two sub-directories: `partial-components` and `view-components`.
+
+### Create View Component Files
+
+Inside the `view-components` directory create two files: `Home.js` and `Todos.js`.
+
+### Create Partial-View Component Files
+
+Inside the `partial-components` directory create seven files: `Logo.js`, `Menu.js`, `Foot.js`, `Sidenav.js`, `Sidenav.scss`, `Topnav.js`, and `Topnav.scss`.
+
+### Filling in the Blanks
+
+The code and contents we will need for each file we just created:
+
+#### `Home.js` (View Component)
+
+```jsx
+import React from 'react';
+
+const Home = () => {
+  document.title = `Home Page`;
+  return (
+    <div className="view-home">
+      <h1>Home Page</h1>
+    </div>
+  )
+}
+
+export default Home;
+```
+
+#### `Todos.js` (View Component)
+
+```jsx
+import React from 'react';
+
+const Todos = () => {
+  document.title = `Todo's Page`;
+  return (
+    <div className="view-home">
+      <h1>Todo's Page</h1>
+    </div>
+  )
+}
+
+export default Todos;
+```
+
+#### `Logo.js` (Partial-View Component)
+
+```jsx
+import React from 'react';
+
+const Logo = () => {
+  return (
+    <div className="logo">
+      <span className="k-icon k-i-check"></span> <span>the-todo.co</span>
+    </div>
+  )
+}
+
+export default Logo;
+```
+
+#### `Menu.js` (Partial-View Component)
+
+```jsx
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
+const Menu = () => {
+  return (
+    <ul>
+      <li className="link">
+        <NavLink tabIndex="2" exact activeClassName="active" to="/">Home</NavLink>
+      </li>
+      <li className="link">
+        <NavLink tabIndex="3" activeClassName="active" to="/todos">To Do's</NavLink>
+      </li>
+      <li className="link">
+        <a tabIndex="4" href="https://github.com/httpJunkie/2019-devreach-react-workshop">
+          Source Code <span className="k-icon k-i-hyperlink-open-sm"></span>
+        </a>
+      </li>
+      <li className="menu"><span className="k-icon k-i-menu"></span></li>
+    </ul>
+  )
+}
+
+export default Menu;
+```
+
+Notice how the `Topnav.js` and `Sidenav.js` files below are nearly identical. They both simply import the menu (component reuse). Their styles (SCSS) will make them different laying out horizontally (Topnav) vs vertically (Sidenav).
+
+#### `Topnav.js` (Partial-View Component)
+
+```jsx
+import React from 'react';
+import './Topnav.scss';
+
+import Menu from './Menu';
+
+const Topnav = () => {
+  return (
+    <div className={`topnav`}>
+      <Menu />
+    </div>
+  )
+}
+
+export default Topnav;
+```
+
+#### `Topnav.scss` (Stylesheet)
+
+```scss
+.topnav {
+  width: 70%;
+  display: flex;
+  justify-content: flex-end;
+}
+  
+.topnav ul { padding: 0; }
+.topnav ul { display: flex; margin: 0; }
+.topnav ul li { list-style-type: none; }
+.topnav ul > li:not(:last-child) { margin-right: 15px; }
+.topnav ul > li a { color: #212529; }
+
+.topnav ul > li.menu { cursor: pointer; cursor: hand; }
+```
+
+#### `Sidenav.js` (Partial-View Component)
+
+```jsx
+import React from 'react';
+import './Sidenav.scss';
+
+import Menu from './Menu';
+
+const Sidenav = () => {
+  return (
+    <div className={`sidenav`}>
+      <Menu />
+    </div>
+  )
+}
+
+export default Sidenav;
+```
+
+#### `Sidenav.scss` (Stylesheet)
+
+```scss
+.sidenav ul {
+  display: flex;
+  flex-direction: column;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+  padding-inline-start: 0;
+}
+.sidenav li {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 60px;
+}
+.sidenav li > a {
+  margin-left: 1em;
+}
+.sidenav li:last-child {
+  display: none;
+}
+
+.active {
+  font-weight: bold;
+}
+
+.sidenav {
+  background-color: #EFEFEF;
+  color: #222222;
+}
+.sidenav li {
+  border-bottom: 1px solid #555555;
+}
+```
+
+#### `Foot.js` (Partial-View Component)
+
+```jsx
+import React from 'react';
+
+const Foot = () => {
+  
+  return (
+    <div className="foot">
+      The Todo Company 2020
+    </div>
+  );
+}
+
+export default Foot;
+```
+
+Now that we have each of those files created, let's put it all together in our `Frame.js` including our routing and everything we need to lazy load our view-components, etc...
+
+#### `Frame.js`
+
+```jsx
+import React, { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+
+const Home = lazy(() => import('./view-components/Home'));
+const Todos = lazy(() => import('./view-components/Todos'));
+const LoadingMessage = () => `loading...`;
+
+import Logo from "./partial-components/Logo";
+import Sidenav from "./partial-components/Sidenav";
+import Topnav from "./partial-components/Topnav";
+import Foot from "./partial-components/Foot";
+
+const Frame = () => {
+  return (
+    <BrowserRouter>
+      <div className={`app-container`}>
+        <main>
+          <header>
+            <Logo />
+            <Topnav />
+          </header>
+          <section>
+            <Switch>
+              <Suspense fallback={<LoadingMessage />}>
+                <Route exact path="/" component={Home} />
+                <Route exact path="/todos" component={Todos} />
+              </Suspense>
+              <Route render={() => <h2>404 Page Not Found</h2>} />
+            </Switch>
+          </section>
+          <footer>
+            <Foot />
+          </footer>
+        </main>
+        <Sidenav />
+      </div>
+    </BrowserRouter>
+  );
+};
+
+export default Frame;
+```
+
+We will now need to add the `Frame` component to our `App` component:
+
+#### `App.js` (Load Our Frame)
+
+```jsx
+import React from 'react';
+
+import 'normalize.css';
+import '@progress/kendo-theme-material/dist/all.css';
+import './App.scss';
+
+import Frame from './Frame';
+
+const App = () => <Frame />;
+
+export default App;
+```
+
+At this point our app is working, we have the classes and styles for our imported components, but we need to add styles to our `App.scss` page that use flexbox and CSS Grid to position our header, section, footer and logo, navigation and some basic text and link styles. Replace what is in the `App.scss` page with the following:
+
+#### `App.scss` (Stylesheet)
+
+```scss
+.app-container {
+  display: flex;
+  height: 100vh;
+  font-family: "Lato", sans-serif;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+p {
+  font-size: 1em;
+  max-width: 80%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  margin-bottom: 0.25em;
+}
+a {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 4px;
+  background-position-y: 1.1em;
+  transition: background-size cubic-bezier(0, 0.5, 0, 1) 0.3s;
+}
+a:hover,
+a:visited:hover,
+a:active:hover {
+  text-decoration: none;
+  background-size: 100% 4px;
+}
+a:focus,
+a:visited {
+  text-decoration: none;
+  background-size: 0% 4px;
+}
+.k-grid-header-wrap a {
+  background-image: none;
+  background-position: 0;
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position-y: auto;
+  transition: none;
+}
+a:active {
+  background-color: 555;
+}
+
+main {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 60px auto 50px;
+}
+
+/* Side Navigation */
+.sidenav {
+  min-width: 150px;
+  height: 100vh;
+}
+
+/* Top Navigation */
+header {
+  display: flex;
+  height: 60px;
+  font-size: 18px;
+}
+.logo {
+  width: 50%;
+  margin: 1em;
+  font-size: 20px;
+}
+.topnav {
+  width: 50%;
+  margin: 1.2em;
+}
+
+/* Content Section */
+section {
+  border-top: 1px solid #010101;
+  background-color: #fff;
+  height: calc(100% - 2em);
+  padding: 1em;
+}
+
+/* Footer */
+footer {
+  height: 50px;
+}
+footer div {
+  margin-left: 1em;
+  margin-top: 1em;
+}
+```
+
+### A Walkthrough Each File and Styles
+
+I know that we have added a lot of styles blindly, so let's take some time in our workshop to go over the structure and what exactly all of this is doing.
+
+*Take 10 mins for Eric to walk through the application and explain what is going on*
+
+This concludes building our Frame. We also still need to do more, for instance, we need to be able to open and close the Sidenav, switch from the menu-icon to links in the Topnav based on the browser width, add styles to our app-container's classes based on what the browser width is (small vs medium), and set state when our Sidenav is open or closed.
+
+Run `npm start` and your app should look like this:
+
+![](https://imgur.com/V35aYJW.jpg)
+
+In our next section, we will make the frame responsive and get a crash course in React Hooks and Context API in order to help us keep track of the global state values and update our components based on it.

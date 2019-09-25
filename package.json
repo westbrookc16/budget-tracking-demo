@@ -40,6 +40,7 @@
     "webpack-dev-server": "^3.8.1"
   },
   "dependencies": {
+    "@progress/kendo-theme-material": "^3.3.3",
     "normalize.css": "^8.0.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
