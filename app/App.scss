@@ -54,9 +54,13 @@ main {
 }
 
 /* Side Navigation */
-.sidenav {
+.sidenav,
+.sidenav.show {
   min-width: 150px;
   height: 100vh;
+}
+.sidenav.hide {
+  display: none;
 }
 
 /* Top Navigation */

@@ -31,3 +31,6 @@
 .sidenav li {
   border-bottom: 1px solid #555555;
 }
+
+.app-container.small .sidenav { display: auto; }
+.app-container.medium .sidenav { display: none; }

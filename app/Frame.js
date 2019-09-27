@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { useMediaPredicate } from "react-media-hook";
 
 const Home = lazy(() => import('./view-components/Home'));
 const Todos = lazy(() => import('./view-components/Todos'));
@@ -11,9 +12,11 @@ import Topnav from "./partial-components/Topnav";
 import Foot from "./partial-components/Foot";
 
 const Frame = () => {
+  const isMedium = useMediaPredicate("(min-width: 600px)");
+  const breakpoint = isMedium ? "medium" : "small";
   return (
     <BrowserRouter>
-      <div className={`app-container`}>
+      <div className={`app-container ${breakpoint}`}>
         <main>
           <header>
             <Logo />

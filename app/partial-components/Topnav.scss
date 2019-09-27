@@ -10,4 +10,9 @@
 .topnav ul > li:not(:last-child) { margin-right: 15px; }
 .topnav ul > li a { color: #212529; }
 
-.topnav ul > li.menu { cursor: pointer; cursor: hand; }
+.app-container.small .topnav ul > li.link { display: none; }
+.app-container.medium .topnav ul > li.link { display: auto; }
+
+.app-container .topnav ul > li.menu { cursor: pointer; cursor: hand; }
+.app-container.small .topnav ul > li.menu { display: auto; }
+.app-container.medium .topnav ul > li.menu { display: none; }

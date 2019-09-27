@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import { AppContext } from "../context/AppContext";
 
 const Menu = () => {
+  const context = useContext(AppContext);
   return (
     <ul>
       <li className="link">
@@ -15,7 +17,18 @@ const Menu = () => {
           Source Code <span className="k-icon k-i-hyperlink-open-sm"></span>
         </a>
       </li>
-      <li className="menu"><span className="k-icon k-i-menu"></span></li>
+      <li className="menu">
+        <span className="k-icon k-i-menu"
+          onKeyPress={event => {
+            if (event.key === "Enter") {
+              context.toggleSidenav(!context.navOpen);
+            }
+          }}
+          onClick={() => {
+            context.toggleSidenav(!context.navOpen);
+          }}
+        ></span>
+      </li>
     </ul>
   )
 }

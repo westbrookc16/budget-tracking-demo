@@ -795,3 +795,230 @@ Run `npm start` and your app should look like this:
 ![](https://imgur.com/V35aYJW.jpg)
 
 In our next section, we will make the frame responsive and get a crash course in React Hooks and Context API in order to help us keep track of the global state values and update our components based on it.
+
+## Creating a Semantic and Responsive Frame (Part 2)
+
+Let's install and use our first React Hook in this project called [react-media-hook](https://www.npmjs.com/package/react-media-hook):
+
+```bash
+npm i react-media-hook
+```
+
+It has two APIs we can try: `useMedia('(min-width: 600px)')` will recieve an object similar to using [matchMedia()](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia#JavaScript) in JavaScript:
+
+```js
+import { useMedia } from "react-media-hook";
+const matchMediaObject = useMedia('(min-width: 600px)');
+```
+
+In this case, `matchMediaObject` could equal something like:
+
+```json
+{
+  matches: true
+  media: "(min-width: 600px)"
+}
+```
+
+This is a bit overkill and we just need that true value. So we can instead try `useMediaPredicate('(min-width: 600px)')` which will return `true` or `false` based on our media query passed in:
+
+```js
+import { useMediaPredicate } from "react-media-hook";
+const isMedium = useMediaPredicate('(min-width: 600px)');
+```
+
+For our needs, `useMediaPredicate` will work, as we just want `isMedium` to be `true` when our browser surpasses 600 pixels and `false` when less than 600 pixels.
+
+We'll use that `true` or `false` value to add a `'small'` or `'medium'` class to our `app-container` div inside `Frame.js`.
+
+let's import `useMediaPredicate` into `Frame.js` just below our `react-router` import:
+
+```js
+import { useMediaPredicate } from "react-media-hook";
+```
+
+Then, above our return statement in the same file, add:
+
+```js
+const isMedium = useMediaPredicate("(min-width: 600px)");
+const breakpoint = isMedium ? "medium" : "small";
+```
+
+Next, add a class to the `app-container` div using  `${breakpoint}` inside our string interpolation:
+
+```jsx
+<div className={`app-container ${breakpoint}`}>
+```
+
+To see this working, run the project and inspect the `app-container` div with F12 (dev tools). Watch the class name change as we resize the browser encountering that 600-pixel threshold.
+
+![](https://imgur.com/gMqqo7n.gif)
+
+With that in place, let's hide the top navigation links and show the menu button on small and visa versa on medium. To do this, replace the last line of `Topnav.scss`:
+
+```scss
+.topnav ul > li.menu { cursor: pointer; cursor: hand; }
+```
+
+With the following:
+
+```scss
+.app-container.small .topnav ul > li.link { display: none; }
+.app-container.medium .topnav ul > li.link { display: auto; }
+
+.app-container .topnav ul > li.menu { cursor: pointer; cursor: hand; }
+.app-container.small .topnav ul > li.menu { display: auto; }
+.app-container.medium .topnav ul > li.menu { display: none; }
+```
+
+Next, append the following code to the end of the `Sidenav.scss` file:
+
+```scss
+.app-container.small .sidenav { display: auto; }
+.app-container.medium .sidenav { display: none; }
+```
+
+This is a good start, and since we don't want the `Sidenav` panel open if there is enough room to display our menu in the `Topnav`, we will enable a default ensuring the `Sidenav` is closed initially (even on small). Next we will create a global state object with `useState` (a built in React Hook) and the Context API.
+
+### Adding Context to Our App
+
+Create a file that will have our Context API Provider. We will use Hooks in conjunction to set the values inside the provider (`useState`) as well as to access that context throughout our app using `useContext`.
+
+Create a folder called `context` inside the `app` directory. Then, inside create the file: `AppContext.js`. Copy in the following code:
+
+```js
+import React, { useState, createContext } from 'react';
+
+const AppContext = createContext();
+
+const AppProvider = props => {
+  const [appData, setApp] = useState({
+    navOpen: false,
+    toggleSidenav: value => setApp(data => (
+      { ...data, navOpen: value }
+    )),
+  });
+  
+  return <AppContext.Provider value={appData}>{props.children}</AppContext.Provider>
+}
+
+export { AppContext, AppProvider };
+```
+
+In this file we import `useState` and `createContext`. Next, we create a context instance named `AppContext`. We then set up an `AppProvider` using the render props pattern. We declare a Hook with `useState`, pass in an object with properties, defaults and methods. In this case, the object has a property named `navOpen`, and a method called `toggleSidenav()` which can be used to modify the state of `navOpen`.
+
+Our `AppProvider`works by returning an `<AppContext.Provider>` component with access to our `appData` state object. It receives that state as props, and gives its children access to it.
+
+### Provide Context to Our Entire App
+
+Next, we need to have access to this state in many places in our app. We want any component to be able to have access to its data, so we need to place the `<AppProvider>` component at the highest level in our component tree. To wrap all components, we must place it in the `App.js` file.
+
+Add the following import to the `App.js` file:
+
+```jsx
+import { AppProvider } from "./context/AppContext";
+```
+
+And replace the line:
+
+```js
+const App = () => <Frame />;
+```
+
+With the following:
+
+```jsx
+const App = () => {
+  return(
+    <AppProvider>
+      <Frame />
+    </AppProvider>
+  )
+};
+```
+
+This will give any component in our application access to our context by wrapping the `<Frame>` component with the `<AppProvider>` component by way of render props.
+
+### Consuming Context in Our App
+
+We want to import our `AppContext` into our `Menu.js` file and our `Sidenav.js` file and consume it with `useContext`.
+
+#### `Menu.js`
+
+Import `useContext` and the `AppContext` from the provider:
+
+```jsx
+import React, { useContext } from 'react';
+import { NavLink } from 'react-router-dom';
+import { AppContext } from "../context/AppContext";
+```
+
+Just above the return statement, we will add our context with a call to `useContext`:
+
+```jsx
+const context = useContext(AppContext);
+```
+
+We tap into that context and change the state of `navOpen` when clicking the menu icon or pressing Enter upon focus.
+
+Replace the last `<li></li>` with:
+
+```jsx
+      <li className="menu">
+        <span className="k-icon k-i-menu"
+          onKeyPress={event => {
+            if (event.key === "Enter") {
+              context.toggleSidenav(!context.navOpen);
+            }
+          }}
+          onClick={() => {
+            context.toggleSidenav(!context.navOpen);
+          }}
+        ></span>
+      </li>
+```
+
+#### `Sidenav.js`
+
+Import `useContext` and the `AppContext` from the provider:
+
+```jsx
+import React, { useContext } from 'react';
+import { AppContext } from "../context/AppContext";
+```
+
+Just above the return statement, we will add our context with a call to `useContext`:
+
+```jsx
+const context = useContext(AppContext);
+```
+
+Last, we alter the className of the parent div with `'show'` or `'hide'` based on the value of the `context.navOpen`:
+
+```jsx
+<div className={`sidenav ${context.navOpen ? 'show' : 'hide'}`}>
+  <Menu />
+</div>
+```
+
+#### `App.scss`
+
+We also need to update a section of `App.scss`. Look for a comment: `/* Side navigation */` and replace it and it's following style with:
+
+```scss
+/* Side Navigation */
+.sidenav,
+.sidenav.show {
+  min-width: 150px;
+  height: 100vh;
+}
+.sidenav.hide {
+  display: none;
+}
+```
+
+Now when we click on the menu icon, it will set the state to it's oposite value, and our `Sidenav` component will re-render the new class and the CSS will hide or show the sidenav panel.
+
+![](https://imgur.com/g7z7f89.gif)
+
+This concludes our "Creating a Semantic and Responsive Frame (Part 2)" section. Next, we will round out our frame by adding a theme toggle using the [Kendo UI Sass Theme Builder](https://themebuilder.telerik.com/kendo-ui), another piece of global state to track `'light'` and `'dark'` and add a KendoReact `Switch` component in the footer to toggle on the fly between light and dark mode.
