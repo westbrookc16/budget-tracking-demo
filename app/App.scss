@@ -81,8 +81,6 @@ header {
 
 /* Content Section */
 section {
-  border-top: 1px solid #010101;
-  background-color: #fff;
   height: calc(100% - 2em);
   padding: 1em;
 }
@@ -94,4 +92,58 @@ footer {
 footer div {
   margin-left: 1em;
   margin-top: 1em;
+}
+
+/* Light Theme */
+.app-container.light {
+  header {
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+  section {
+    border-top: 1px solid #010101;
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+  section a {
+    background-color: #EEEEEE;
+  }
+  footer {
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+  input {
+    color: #222222;
+  }
+
+  /* Kendo material Light*/
+  @import "/sass/blue-pink-light/all.scss";
+  @import "/sass/blue-pink-light/variables.scss";
+}
+
+/* Dark Theme */
+.app-container.dark {
+  header {
+    background-color: #010101;
+    color: #FFFFFF;
+  }
+  section {
+    border-top: 1px solid #EFEFEF;
+    background-color: #010101;
+    color: #FFFFFF;
+  }
+  section a {
+    background-color: #333333;
+  }
+  footer {
+    background-color: #010101;
+    color: #FFFFFF;
+  }
+  input {
+    color: #FFFFFF;
+  }
+
+  /* Kendo material dark*/
+  @import "./sass/cyan-amber-dark/all.scss";
+  @import "./sass/cyan-amber-dark/variables.scss";
 }

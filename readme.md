@@ -1022,3 +1022,481 @@ Now when we click on the menu icon, it will set the state to it's oposite value,
 ![](https://imgur.com/g7z7f89.gif)
 
 This concludes our "Creating a Semantic and Responsive Frame (Part 2)" section. Next, we will round out our frame by adding a theme toggle using the [Kendo UI Sass Theme Builder](https://themebuilder.telerik.com/kendo-ui), another piece of global state to track `'light'` and `'dark'` and add a KendoReact `Switch` component in the footer to toggle on the fly between light and dark mode.
+
+## Alternate Theme With Kendo UI Sass Theme Builder
+
+Having a dark theme is typically a good option to add to your site, rarely do sites give you the ability to select many, but having a light vs dark theme is great for experience and accessibility. 
+
+We need to think about our custom styles like background and text color, how they change for each theme.  We also have a suite of components we will be using from KendoReact, which are themeable (common for CSS frameworks and component libraries). 
+
+The first step is to get the custom stuff matching with our component theme.
+
+### Matching The KendoReact Theme to Our Custom Styles
+
+We already have a light theme going on, so we will start there. KendoReact has a Default, Bootstrap and Material Design theme that I can choose from many light themes and can get us started using the [Kendo UI Sass Theme Builder](https://themebuilder.telerik.com/kendo-ui).
+
+Once downloaded, unpack the compressed files in place. We will put the files for each theme in a new directory called `app\sass\`. 
+
+![](https://imgur.com/Dum6T4B.gif)
+
+We will name the package `blue-pink-light` and once downloaded and unpacked we will have two files inside: `all.css` and `variables.scss`. Rename `all.css` to `all.scss`.
+
+We are going to import these two files into our existing `App.scss` nested inside a SCSS selector and this will namespace (scope) our theme alterations to `app-container.light`.
+
+Inside our `App.js`, we have stylesheets loading in order:
+
+```jsx
+import 'normalize.css';
+import '@progress/kendo-theme-material/dist/all.css';
+import './App.scss';
+```
+
+We want to inject these files after the `kendo-theme-material/dist/all.css` file. Inside `App.scss` is perfect. 
+
+Add a class to our `app-container` div in `Frame.js`. We will hard-code it to be just `'light'` for now. Eventually this class wil be bound to our `themeMode` property in our global state.
+
+```scss
+<div className={`app-container ${breakpoint} light`}>
+```
+
+WE make our application more flexible with a two theme setup. It also allows for more (maybe saturated?) if needed. But for now, we just want to take advantage of displaying something dark if that is what they prefer on ther device. This is a big opportunity for us (branding etc..). 
+
+with this class, we can now create a nested SCSS selector to encapsulate the light vs dark theme through namespacing. 
+
+Replace `App.scss` with:
+
+```scss
+.app-container {
+  display: flex;
+  height: 100vh;
+  font-family: "Lato", sans-serif;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+p {
+  font-size: 1em;
+  max-width: 80%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  margin-bottom: 0.25em;
+}
+a {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 4px;
+  background-position-y: 1.1em;
+  transition: background-size cubic-bezier(0, 0.5, 0, 1) 0.3s;
+}
+a:hover,
+a:visited:hover,
+a:active:hover {
+  text-decoration: none;
+  background-size: 100% 4px;
+}
+a:focus,
+a:visited {
+  text-decoration: none;
+  background-size: 0% 4px;
+}
+.k-grid-header-wrap a {
+  background-image: none;
+  background-position: 0;
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position-y: auto;
+  transition: none;
+}
+a:active {
+  background-color: 555;
+}
+
+main {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 60px auto 50px;
+}
+
+/* Side Navigation */
+.sidenav,
+.sidenav.show {
+  min-width: 150px;
+  height: 100vh;
+}
+.sidenav.hide {
+  display: none;
+}
+
+/* Top Navigation */
+header {
+  display: flex;
+  height: 60px;
+  font-size: 18px;
+}
+.logo {
+  width: 50%;
+  margin: 1em;
+  font-size: 20px;
+}
+.topnav {
+  width: 50%;
+  margin: 1.2em;
+}
+
+/* Content Section */
+section {
+  height: calc(100% - 2em);
+  padding: 1em;
+}
+
+/* Footer */
+footer {
+  height: 50px;
+}
+footer div {
+  margin-left: 1em;
+  margin-top: 1em;
+}
+
+/* Light Theme */
+.app-container.light {
+  header {
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+  section {
+    border-top: 1px solid #010101;
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+  section a {
+    background-color: #EEEEEE;
+  }
+  footer {
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+  input {
+    color: #222222;
+  }
+
+  /* Kendo material Light*/
+  @import "/sass/blue-pink-light/all.scss";
+  @import "/sass/blue-pink-light/variables.scss";
+}
+```
+
+Our new "Light Theme" has a nested `@import`. Understand how this works, and how namespacing is being applied. We moved some properties from the old code into this new specific SCSS selector mathcing: `app-container.light`.
+
+The only modification I did to the originall was that I moved the following properties:
+
+```scss
+  section {
+    border-top: 1px solid #010101;
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+```
+
+Into a new selector giving it more specificity. 
+
+```scss
+.app-container.light {
+  section {
+    border-top: 1px solid #010101;
+    background-color: #FFFFFF;
+    color: #222222;
+  }
+}
+```
+
+Now styles like size and position that need to be consistent over both themes are everything at the root level of the document. Colors and text, things that are specific to each theme are extracted into namespace with light or dark options. 
+
+This will stay consistent as we also do the same in `Sidenav.scss` and `Topnav.scss`.
+
+For changing the theme from light to dark in the UI we will use a KendoReact `Switch`, lights on or lights off so to speak.
+
+### Adding KendoReact Components
+
+The [KendoReact Switch](https://www.telerik.com/kendo-react-ui/components/inputs/switch/) is part of the [KendoReact Inputs](https://www.telerik.com/kendo-react-ui/components/inputs/)  documentation which shows us what to `npm install` and what to `import` into the component and it's JSX. So let's install it.
+
+```bash
+npm i @progress/kendo-react-inputs @progress/kendo-react-intl @progress/kendo-drawing
+```
+
+With that installed, let's update our `Foot.js` page with an import and add the component to the JSX:
+
+```jsx
+import React from 'react';
+import { Switch } from '@progress/kendo-react-inputs';
+
+const Foot = () => {
+  
+  return (
+    <div className="foot">
+      The Todo Company &copy; | &nbsp;
+      <Switch
+        onLabel={"light theme"}
+        offLabel={"dark theme"}
+      />
+    </div>
+  );
+}
+
+export default Foot;
+```
+
+Great, our `Switch` is on the page, it has a blue highlight when turned on, your page should look and behave like the animation below:
+
+![](https://imgur.com/88xEpxk.gif)
+
+What we now need to do is wire this switch up to toggle the theme. If we visit the [KendoReact Switch documentation](https://www.telerik.com/kendo-react-ui/components/inputs/switch/) we would find that it has an `onChange()` method, as one would expect that can trigger on each toggle of the switch. In other words, when you click me, I do something on every change from on to off.
+
+### Wiring up Our Switch to Work with Our Context
+
+The `Switch` component is setup, and we will need to create another propety in our global state that we can affect when this `Switch` is turned on and off, but first I want to show you how we can possibly tell the users preferred theme.
+
+### Checking the User's Preferred Color Scheme
+
+We will take advantage of a media query named `refers-color-scheme`. Normally you could call this in CSS and do something like:
+
+```scss
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #111;
+    color: #eee;
+  }
+}
+```
+
+We just used `react-media-hook` to check a minimum width on the browser, and everytime it changes, we can react to those changes in our component and display the correct breakpoint:
+
+```js
+import { useMediaPredicate } from "react-media-hook";
+let breakpoint = useMediaPredicate("(min-width: 600px)") ? "medium" : "small";
+```
+
+We can do the same thing for `prefers-color-scheme`, but first we need to import `useMediaPredicate`:
+
+```js
+import { useMediaPredicate } from "react-media-hook";
+```
+
+Then we can add a constant named `preferredTheme` to the `AppProvider` component inside the `context/AppContext.js` file. Drop this line of code, just above the `appData` state:
+
+```js
+const preferredTheme = useMediaPredicate("(prefers-color-scheme: dark)") ? "dark" : "light";
+```
+
+This gives me an easy way to know if the user prefers `'dark'` vs `'light'` on their device. It returns `true` if it matched and I use it's returned boolean value to set a constant named `preferredTheme`.
+
+Next, we will add the following code to our AppProvider's `appData` default object, put this just after `toggleSidenav()` method:
+
+```js
+    themeMode: localStorage.getItem('kr_todo_theme') || preferredTheme,
+    changeTheme: mode => setApp(data => (
+      {...data, themeMode: mode }
+    ))
+```
+
+This checks localStorage first, because if the user has a saved theme preference with us, we prioritize that. Otherwise we fallback to `preferredTheme`. The values I can expect to get back are: `['dark','light','no-preference']`, as found in the docs on mozilla.org: [Mozilla page for `prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme).
+
+We check for `'dark'` first because if they don't have that as `prefers-color-scheme`, we know that we want to fall back to `'light'` because they either prefer `'light'` or they have `'no-preference'` meaning we still default to light mode.
+
+### Side Effect Needed When `themeMode` Changes
+
+We should know a little about `useEffect()`, enough to understand that it is the mechanism used in conjunction with hooks and state to set our `localStorgage` each time we change it with the `Switch`. So we will add a `useEffect` right here inside the AppProvider, and it will run anytime that `appData.themeMode` get's changed.
+
+Let's first import `useEffect` from `'react'`:
+
+```js
+import React, { useState, useEffect, createContext } from "react";
+```
+
+We can `useEffect` just below where we setup our AppProvider's `useState` hook and simply `setItem` on our localStorage. This thing fires on first render and depends on the `[app.Data.themeMode]` in it's dependency array meaning that it will only rerender when `themeMode` receives changes.
+
+```js
+  useEffect(() => {
+    localStorage.setItem('kr_todo_theme', appData.themeMode)
+    }, [appData.themeMode]
+  );
+```
+
+### Getting back to Our Switch
+
+Let's get back to the `partial-components/Foot.js` file and import `useContext` from `'react'` and `AppContext`:
+
+```js
+import React, { useContext } from 'react';
+import { AppContext } from "../context/AppContext";
+```
+
+Create a constant named `context` to make our global state available in the `Foot` component at the top level along with a value that we can reference to check if the current mode `isLight`:
+
+```js
+const context = useContext(AppContext);
+const isLight = context.themeMode === 'light';
+```
+
+We can now add a handler for our `Switch` component, just above the return statement we need to handle the switches `onChange` and set the new value for `themeMode` by passing the opposite theme state as the next value:
+
+```js
+  const handleSwitch = () => {
+    context.changeTheme(isLight ? 'dark' : 'light');
+  }
+```
+
+Finally we just need to update the `Switch` component. Add an `onChange()` handler that calls our `handleSwitch()` function. And we also check to see what the current value is for `context.themeMode` and make sure the `Switch` is flipped to the right position:
+
+```jsx
+      <Switch
+        onChange={handleSwitch}
+        checked={isLight}
+        onLabel={"light theme"}
+        offLabel={"dark theme"}
+      />
+```
+
+### Adding a Theme CSS Class to `app-container`
+
+Now that the `Switch` works and changes the `context.themeMode` when we click it, we need our `app-container` div inside of `Frame.js` to reflect this class. First we will import `useContext` and `AppContext` into the `Frame.js` page:
+
+```js
+import React, { useContext, lazy, Suspense } from "react";
+import { AppContext } from "./context/AppContext";
+```
+
+Next we need to create a const named `context` at the top level of our `Frame` component, just above our `isMedium` constant:
+
+```js
+const context = useContext(AppContext);
+```
+
+Now we can bind one of our classes on the `app-container` div to this `context.themeMode`:
+
+```js
+<div className={`app-container ${breakpoint} ${context.themeMode}`}>
+```
+
+We should be able to see the class changing if we run the project and inspect the `app-container` div:
+
+![](https://imgur.com/atBZaes.gif)
+
+Although our `Switch` is functional, we need to add the dark theme from the [Kendo UI Sass Theme Builder](https://themebuilder.telerik.com/kendo-ui) and have the CSS respond and switch to a dark theme, we will need to add code to the `App.scss`, `Sidenav.scss` and `Topnav.scss` to achieve this.
+
+### Going Dark Mode
+
+We need to get a dark Material Design theme and we will get it from the [Kendo UI Sass Theme Builder](https://themebuilder.telerik.com/kendo-ui). I'm getting the theme named `'cyan-amber-dark'`.
+
+![](https://imgur.com/FV3Peeh.gif)
+
+Once downloaded, unpack the compressed files in place, you should now have an `app\sass\cyan-amber-dark` folder with two files inside: `all.css` and `variables.scss`. Rename `all.css` to `all.scss`.
+
+We will import these files into our `App.scss` file and nest them inside of an SCSS selector and this will scope certain styles to the CSS namespace of `app-container.light`.
+
+We want to inject these files after the `kendo-material-theme`, just like we did with the light theme earlier in `App.scss`. We need to create another nested SCSS set of styles for the dark theme. It will have a comment above it, just as the light mode version, let's paste this one right under the light theme code in the `App.scss` file:
+
+```scss
+/* Dark Theme */
+.app-container.dark {
+  header {
+    background-color: #010101;
+    color: #FFFFFF;
+  }
+  section {
+    border-top: 1px solid #EFEFEF;
+    background-color: #010101;
+    color: #FFFFFF;
+  }
+  section a {
+    background-color: #333333;
+  }
+  footer {
+    background-color: #010101;
+    color: #FFFFFF;
+  }
+  input {
+    color: #FFFFFF;
+  }
+
+  /* Kendo material dark*/
+  @import "./sass/cyan-amber-dark/all.scss";
+  @import "./sass/cyan-amber-dark/variables.scss";
+}
+```
+
+I have simply copy-and-pasted the Light theme `.app-container.light` selector and renamed it to `.app-container.dark`, reset all of the property values and imported the files from the `cyan-amber-dark` directory: `all.css` and `variables.scss` at the end, just as we did in the light theme.
+
+### Sidenav and Topnav Theming
+
+We have some CSS in two other files and I would like to add a few lines of CSS in each one now that we will be having a second theme in place:
+
+#### Add Dark Theme to `Sidenav`
+
+From the `Sidenav.scss` we removed the following code:
+
+```scss
+.sidenav {
+  background-color: #EFEFEF;
+  color: #222222;
+}
+.sidenav li {
+  border-bottom: 1px solid #555555;
+}
+```
+
+And put this in its place:
+
+```scss
+/* Light Theme */
+.app-container.light {
+  .sidenav {
+    background-color: #EFEFEF;
+    color: #222222;
+  }
+  .sidenav li {
+    border-bottom: 1px solid #555555;
+  }
+}
+
+/* Dark Theme */
+.app-container.dark {
+  .sidenav {
+    background-color: #1e1e1e;
+    color: #FFFFFF;
+  }
+  .sidenav li {
+    border-bottom: 1px solid #EFEFEF;
+  }
+}
+```
+
+#### Add Dark Theme to `Topnav`
+
+From the `Topnav.scss` we appended the following styles to the end of the file:
+
+```scss
+/* Light Theme */
+.app-container.light {
+  .topnav ul > li a {
+    color: rgb(33, 37, 41);
+  }
+}
+
+/* Dark Theme */
+.app-container.dark {
+  .topnav ul > li a {
+    color: rgb(240, 240, 240);
+  }
+}
+```
+
+If you have not stopped your project, you will need to now and run `npm start` again. With the project restarted you should get the full theme switching experience:
+
+![](https://imgur.com/yQVvgqk.gif)
+
+This concludes our section on creating a theme and making it toggle from light to dark on the fly. We should quickly go over all of the things we have going on in this project to get this frame in place.

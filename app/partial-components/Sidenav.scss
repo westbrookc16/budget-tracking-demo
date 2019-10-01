@@ -24,12 +24,26 @@
   font-weight: bold;
 }
 
-.sidenav {
-  background-color: #EFEFEF;
-  color: #222222;
+/* Light Theme */
+.app-container.light {
+  .sidenav {
+    background-color: #EFEFEF;
+    color: #222222;
+  }
+  .sidenav li {
+    border-bottom: 1px solid #555555;
+  }
 }
-.sidenav li {
-  border-bottom: 1px solid #555555;
+
+/* Dark Theme */
+.app-container.dark {
+  .sidenav {
+    background-color: #1e1e1e;
+    color: #FFFFFF;
+  }
+  .sidenav li {
+    border-bottom: 1px solid #EFEFEF;
+  }
 }
 
 .app-container.small .sidenav { display: auto; }
