@@ -1,8 +1,5 @@
 {
-  "plugins": [
-    "react",
-    "react-hooks"
-  ],
+  "plugins": ["react", "react-hooks"],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
@@ -18,7 +15,6 @@
   },
   "extends": [],
   "rules": {
-    "semi": ["warn", "always"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "react/jsx-no-duplicate-props": "error"

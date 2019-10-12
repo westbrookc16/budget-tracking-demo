@@ -1,24 +1,61 @@
-import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-
-const Menu = () => {
+import { UserContext } from "../firebase/FirebaseUser";
+import { FirebaseContext } from "../firebase/firebase";
+import { Redirect } from "react-router-dom";
+import { useAuthState } from "../firebase/firebase-hooks";
+const Menu = ({ history }) => {
   const context = useContext(AppContext);
+  const user = useContext(UserContext);
+  const firebase = useContext(FirebaseContext);
+  const [signOutState, setSignOut] = useState(0);
   return (
     <ul>
       <li className="link">
-        <NavLink tabIndex="2" exact activeClassName="active" to="/">Home</NavLink>
+        <NavLink tabIndex="2" exact activeClassName="active" to="/">
+          Home
+        </NavLink>
       </li>
-      <li className="link">
-        <NavLink tabIndex="3" activeClassName="active" to="/todos">To Do's</NavLink>
-      </li>
-      <li className="link">
-        <a tabIndex="4" href="https://github.com/httpJunkie/2019-devreach-react-workshop">
-          Source Code <span className="k-icon k-i-hyperlink-open-sm"></span>
-        </a>
-      </li>
+      {!user && (
+        <li className="link">
+          <a
+            href="#"
+            onClick={e => {
+              e.preventDefault();
+              firebase.auth
+                .signInWithPopup(firebase.googleProvider)
+                .then(u => {});
+            }}
+          >
+            Sign In
+          </a>
+        </li>
+      )}
+
+      {user && (
+        <li className="link">
+          <NavLink tabIndex="3" exact activeClassName="active" to="/budget">
+            Budget Management
+          </NavLink>
+        </li>
+      )}
+      {user && (
+        <li className="link">
+          <a
+            href="#"
+            onClick={e => {
+              firebase.signOut();
+              setSignOut(1);
+            }}
+          >
+            Sign Out
+          </a>
+        </li>
+      )}
       <li className="menu">
-        <span className="k-icon k-i-menu"
+        <span
+          className="k-icon k-i-menu"
           onKeyPress={event => {
             if (event.key === "Enter") {
               context.toggleSidenav(!context.navOpen);
@@ -29,8 +66,9 @@ const Menu = () => {
           }}
         ></span>
       </li>
+      {signOutState == 1 && <Redirect to="/" />}
     </ul>
-  )
-}
+  );
+};
 
 export default Menu;

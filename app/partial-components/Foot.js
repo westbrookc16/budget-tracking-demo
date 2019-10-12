@@ -7,12 +7,12 @@ const Foot = () => {
   const isLight = context.themeMode === "light";
 
   const handleSwitch = () => {
-    context.changeTheme(isLight ? 'dark' : 'light');
-  }
+    context.changeTheme(isLight ? "dark" : "light");
+  };
 
   return (
     <div className="foot">
-      The Todo Company &copy; | &nbsp;
+      Chris Westbrook &copy; 2019 | &nbsp;
       <Switch
         onChange={handleSwitch}
         checked={isLight}

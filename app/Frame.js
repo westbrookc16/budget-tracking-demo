@@ -2,9 +2,10 @@ import React, { useContext, lazy, Suspense } from "react";
 import { AppContext } from "./context/AppContext";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useMediaPredicate } from "react-media-hook";
-
-const Home = lazy(() => import('./view-components/Home'));
-const Todos = lazy(() => import('./view-components/Todos'));
+import { UserContext } from "./firebase/FirebaseUser";
+const Home = lazy(() => import("./view-components/Home"));
+const Todos = lazy(() => import("./view-components/Todos"));
+const Budget = lazy(() => import("./view-components/Budget"));
 const LoadingMessage = () => `loading...`;
 
 import Logo from "./partial-components/Logo";
@@ -16,6 +17,7 @@ const Frame = () => {
   const context = useContext(AppContext);
   const isMedium = useMediaPredicate("(min-width: 600px)");
   const breakpoint = isMedium ? "medium" : "small";
+  const user = useContext(UserContext);
   return (
     <BrowserRouter>
       <div className={`app-container ${breakpoint} ${context.themeMode}`}>
@@ -23,12 +25,14 @@ const Frame = () => {
           <header>
             <Logo />
             <Topnav />
+            {user && <div>Hello {user.displayName}</div>}
           </header>
           <section>
             <Switch>
               <Suspense fallback={<LoadingMessage />}>
                 <Route exact path="/" component={Home} />
                 <Route exact path="/todos" component={Todos} />
+                <Route exact path="/budget" component={Budget} />
               </Suspense>
               <Route render={() => <h2>404 Page Not Found</h2>} />
             </Switch>
