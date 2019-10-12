@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useMediaPredicate } from "react-media-hook";
 import { UserContext } from "./firebase/FirebaseUser";
 const Home = lazy(() => import("./view-components/Home"));
-const Todos = lazy(() => import("./view-components/Todos"));
+
 const Budget = lazy(() => import("./view-components/Budget"));
 const LoadingMessage = () => `loading...`;
 
@@ -31,7 +31,7 @@ const Frame = () => {
             <Switch>
               <Suspense fallback={<LoadingMessage />}>
                 <Route exact path="/" component={Home} />
-                <Route exact path="/todos" component={Todos} />
+
                 <Route exact path="/budget" component={Budget} />
               </Suspense>
               <Route render={() => <h2>404 Page Not Found</h2>} />

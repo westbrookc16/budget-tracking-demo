@@ -18,8 +18,10 @@ import {
 } from "@progress/kendo-react-dropdowns";
 import { UserContext } from "../firebase/FirebaseUser";
 import { FirebaseContext } from "../firebase/firebase";
+import Categories from "./Categories";
 const Budget = props => {
   document.title = "Budget Management";
+  const years = ["2019", "2020", "2021"];
   const months = [
     { text: "Jan", value: 1 },
     { text: "Feb", value: 2 },
@@ -40,7 +42,7 @@ const Budget = props => {
   const [month, setMonth] = useState({ value: 10 });
   const [year, setYear] = useState("2019");
   const [income, setIncome] = useState(0);
-  const years = ["2019", "2020", "2021"];
+  const [totalSpent, setTotalSpent] = useState(0);
   async function setBudget() {
     try {
       const budget = {
@@ -118,6 +120,26 @@ const Budget = props => {
       >
         Save
       </Button>
+      <Categories
+        budgetID={`${user.uid}${year}${month.value}`}
+        setTotalSpent={e => {
+          setTotalSpent(e);
+        }}
+      />
+      <table>
+        <thead>
+          <tr>
+            <th>Total Income</th>
+            <th>Total Spent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{income}</td>
+            <td>{totalSpent}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
