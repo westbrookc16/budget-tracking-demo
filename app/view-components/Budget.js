@@ -127,8 +127,8 @@ const Budget = props => {
         />
       </p>
       <p>
-        <label htmlFor="txtIncome">Monthly Income</label>
         <NumericTextBox
+          label="Monthly INcome"
           value={income}
           id="txtIncome"
           format="c2"

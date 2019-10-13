@@ -23,6 +23,7 @@ import {
 const Categories = ({ budgetID, setTotalSpent }) => {
   const [categories, setCategories] = useState([]);
   const firebase = useContext(FirebaseContext);
+  //variables for new category addition
   const [name, setName] = useState("");
   const [amount, setAmount] = useState(0);
   useEffect(() => {
@@ -47,9 +48,27 @@ const Categories = ({ budgetID, setTotalSpent }) => {
 
   //calculate total spent per month when categories changes
   useEffect(() => {
-    const total = categories.reduce((p, c, i) => p + parseFloat(c.amount), 0);
+    const total = categories.reduce(
+      (accumulator, c, i) => accumulator + parseFloat(c.amount),
+      0
+    );
     setTotalSpent(formatMoney(total, 2, ".", ","));
   }, [setTotalSpent, categories]);
+  //deleting of categories
+  const removeCat = dataItem => {
+    const { id, name } = dataItem;
+    if (confirm(`are you dsure you want to remove ${name}?`)) {
+      firebase.db
+        .collection("categories")
+        .doc(id)
+        .delete()
+        .then(u => {
+          setCategories(c => {
+            return c.filter(value => value.id !== id);
+          });
+        });
+    }
+  };
   return (
     <div>
       <h1>Add/Edit Categories</h1>
@@ -57,7 +76,23 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       budgeted matches your total spent.
       <Grid style={{ height: "400px" }} data={categories}>
         <Column field="name" title="Name" width="40px" />
-        <Column field="amount" title="amount" width="40px" />
+        <Column field="amount" title="amount" width="40px" format="c2" />
+        <Column
+          title="Delete"
+          cell={props => {
+            const { dataItem } = props;
+            return (
+              <button
+                onClick={e => {
+                  e.preventDefault();
+                  removeCat(dataItem);
+                }}
+              >
+                Remove
+              </button>
+            );
+          }}
+        ></Column>
       </Grid>
       <h1>Add Category</h1>
       <form>
