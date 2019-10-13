@@ -48,27 +48,24 @@ const Budget = props => {
   const [msg, setMsg] = useState("");
   const setAlert = alert => {
     setMsg(alert);
-    console.log(alert);
+
     setTimeout(() => {
       setMsg("");
-      console.log("timeout");
     }, 5000);
   };
-  const setTotalSpentAndAlert = useCallback(
-    e => {
-      setTotalSpent(e);
-      setAlert(
-        `There is ${formatMoney(
-          parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
-          2,
-          ".",
-          ","
-        )} left to budget.`
-      );
-      console.log(`income=${income}`);
-    },
-    [setTotalSpent, income]
-  );
+  const setTotalSpentAndAlert = e => {
+    setTotalSpent(e);
+    console.log(`e = ${e}`);
+    /*setAlert(
+      `There is ${formatMoney(
+        parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
+        2,
+        ".",
+        ","
+      )} left to budget.`
+    );*/
+    //console.log(`income=${income}`);
+  };
   async function setBudget() {
     try {
       const budget = {
@@ -86,12 +83,14 @@ const Budget = props => {
   }
   useEffect(() => {
     async function getBudget() {
+      if (!user.uid) return;
       const doc = await firebase.db
         .collection("budgets")
         .doc(`${user.uid}${year}${month.value}`)
         .get();
       if (doc.exists) {
         const data = doc.data();
+        console.log(`income=${data.income}`);
         setIncome(data.income);
       } else {
         setIncome(0);
@@ -99,6 +98,7 @@ const Budget = props => {
     }
     getBudget();
   }, [month, year, user, firebase.db]);
+
   return (
     <div>
       <h1>Budget Management</h1>
@@ -128,10 +128,10 @@ const Budget = props => {
       </p>
       <p>
         <NumericTextBox
-          label="Monthly INcome"
+          label="Monthly Income"
           value={income}
           id="txtIncome"
-          format="c2"
+          format="n2"
           onChange={e => {
             setIncome(e.target.value);
           }}
@@ -151,21 +151,24 @@ const Budget = props => {
         budgetID={`${user.uid}${year}${month.value}`}
         setTotalSpent={setTotalSpentAndAlert}
       />
-      <table>
-        <thead>
-          <tr>
-            <th>Total Income</th>
-            <th>Total Spent</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{formatMoney(income, 2, ".", ",")}</td>
-            <td>{formatMoney(totalSpent, 2, ".", ",")}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div aria-live="on">
+        <table>
+          <thead>
+            <tr>
+              <th>Total Income</th>
+              <th>Total Spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr key={`${income}${totalSpent}`}>
+              <td>{formatMoney(income, 2, ".", ",")}</td>
+              <td>{formatMoney(totalSpent, 2, ".", ",")}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <Alert>{msg}</Alert>
+      {`totalSpent=${totalSpent}`}
     </div>
   );
 };

@@ -76,20 +76,22 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       budgeted matches your total spent.
       <Grid style={{ height: "400px" }} data={categories}>
         <Column field="name" title="Name" width="40px" />
-        <Column field="amount" title="amount" width="40px" format="c2" />
+        <Column field="amount" title="amount" width="40px" />
         <Column
           title="Delete"
           cell={props => {
             const { dataItem } = props;
             return (
-              <button
-                onClick={e => {
-                  e.preventDefault();
-                  removeCat(dataItem);
-                }}
-              >
-                Remove
-              </button>
+              <td>
+                <button
+                  onClick={e => {
+                    e.preventDefault();
+                    removeCat(dataItem);
+                  }}
+                >
+                  Remove
+                </button>
+              </td>
             );
           }}
         ></Column>
@@ -107,7 +109,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
           label="Amount"
           value={amount}
           id="txtAmount"
-          format="c2"
+          format="n2"
           onChange={e => {
             setAmount(e.target.value);
           }}
