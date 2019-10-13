@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import { formatMoney } from "../utils/numbers";
 import { FirebaseContext } from "../firebase/firebase";
 import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
@@ -47,8 +48,8 @@ const Categories = ({ budgetID, setTotalSpent }) => {
   //calculate total spent per month when categories changes
   useEffect(() => {
     const total = categories.reduce((p, c, i) => p + parseFloat(c.amount), 0);
-    setTotalSpent(total);
-  }, [categories, setTotalSpent]);
+    setTotalSpent(formatMoney(total, 2, ".", ","));
+  }, [setTotalSpent, categories]);
   return (
     <div>
       <h1>Add/Edit Categories</h1>

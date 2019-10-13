@@ -1,4 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useCallback, useState, useContext, useEffect } from "react";
+import Alert from "@reach/alert";
+import { formatMoney } from "../utils/numbers";
 import { Button } from "@progress/kendo-react-buttons";
 import {
   NumericTextBox,
@@ -43,6 +45,30 @@ const Budget = props => {
   const [year, setYear] = useState("2019");
   const [income, setIncome] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
+  const [msg, setMsg] = useState("");
+  const setAlert = alert => {
+    setMsg(alert);
+    console.log(alert);
+    setTimeout(() => {
+      setMsg("");
+      console.log("timeout");
+    }, 5000);
+  };
+  const setTotalSpentAndAlert = useCallback(
+    e => {
+      setTotalSpent(e);
+      setAlert(
+        `There is ${formatMoney(
+          parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
+          2,
+          ".",
+          ","
+        )} left to budget.`
+      );
+      console.log(`income=${income}`);
+    },
+    [setTotalSpent, income]
+  );
   async function setBudget() {
     try {
       const budget = {
@@ -115,16 +141,15 @@ const Budget = props => {
         primary={true}
         onClick={e => {
           setBudget();
-          alert("budget set successfully");
+          setAlert(`Your budget was saved successfully.`);
+          //alert("budget set successfully");
         }}
       >
         Save
       </Button>
       <Categories
         budgetID={`${user.uid}${year}${month.value}`}
-        setTotalSpent={e => {
-          setTotalSpent(e);
-        }}
+        setTotalSpent={setTotalSpentAndAlert}
       />
       <table>
         <thead>
@@ -135,11 +160,12 @@ const Budget = props => {
         </thead>
         <tbody>
           <tr>
-            <td>{income}</td>
-            <td>{totalSpent}</td>
+            <td>{formatMoney(income, 2, ".", ",")}</td>
+            <td>{formatMoney(totalSpent, 2, ".", ",")}</td>
           </tr>
         </tbody>
       </table>
+      <Alert>{msg}</Alert>
     </div>
   );
 };
