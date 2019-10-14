@@ -53,19 +53,21 @@ const Budget = props => {
       setMsg("");
     }, 5000);
   };
-  const setTotalSpentAndAlert = e => {
-    setTotalSpent(e);
-    console.log(`e = ${e}`);
-    /*setAlert(
-      `There is ${formatMoney(
-        parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
-        2,
-        ".",
-        ","
-      )} left to budget.`
-    );*/
-    //console.log(`income=${income}`);
-  };
+  const setTotalSpentAndAlert = useCallback(
+    e => {
+      setTotalSpent(e);
+      console.log(`e = ${e}`);
+      setAlert(
+        `There is ${formatMoney(
+          parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
+          2,
+          ".",
+          ","
+        )} left to budget.`
+      );
+    },
+    [setTotalSpent, income]
+  );
   async function setBudget() {
     try {
       const budget = {
@@ -151,24 +153,12 @@ const Budget = props => {
         budgetID={`${user.uid}${year}${month.value}`}
         setTotalSpent={setTotalSpentAndAlert}
       />
-      <div aria-live="on">
-        <table>
-          <thead>
-            <tr>
-              <th>Total Income</th>
-              <th>Total Spent</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr key={`${income}${totalSpent}`}>
-              <td>{formatMoney(income, 2, ".", ",")}</td>
-              <td>{formatMoney(totalSpent, 2, ".", ",")}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <h1>Status</h1>
+      <ul>
+        <li>Total Income: {formatMoney(income, 2, ".", ",")}</li>
+        <li>Total Spent: {totalSpent}</li>
+      </ul>
       <Alert>{msg}</Alert>
-      {`totalSpent=${totalSpent}`}
     </div>
   );
 };

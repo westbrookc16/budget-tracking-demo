@@ -53,6 +53,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       0
     );
     setTotalSpent(formatMoney(total, 2, ".", ","));
+    console.log(`total=${total}`);
   }, [setTotalSpent, categories]);
   //deleting of categories
   const removeCat = dataItem => {
