@@ -115,7 +115,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
             setAmount(e.target.value);
           }}
         />
-        <button
+        <Button
           primary="true"
           onClick={e => {
             e.preventDefault();
@@ -124,6 +124,8 @@ const Categories = ({ budgetID, setTotalSpent }) => {
               .collection("categories")
               .add(budget)
               .then(doc => {
+                setName("");
+                setAmount(0);
                 setCategories(c => {
                   return [...c, { id: doc.id, ...budget }];
                 });
@@ -131,7 +133,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
           }}
         >
           Add
-        </button>
+        </Button>
       </form>
     </div>
   );
