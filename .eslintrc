@@ -13,7 +13,7 @@
     "browser": true,
     "node": true
   },
-  "extends": [],
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

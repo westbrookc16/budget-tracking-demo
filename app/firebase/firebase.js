@@ -7,10 +7,10 @@ import "firebase/firestore";
 export class Firebase {
   constructor() {
     app.initializeApp(config);
-    console.log("app initialized");
+    //console.log("app initialized");
 
     this.emailProvider = app.auth.EmailAuthProvider.PROVIDER_ID;
-    this.googleProvider = new app.auth.GoogleAuthProvider();
+    this.googleProvider = app.auth.GoogleAuthProvider.PROVIDER_ID;
 
     this.auth = app.auth();
 

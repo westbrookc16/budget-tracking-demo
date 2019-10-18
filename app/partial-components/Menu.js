@@ -4,8 +4,8 @@ import { AppContext } from "../context/AppContext";
 import { UserContext } from "../firebase/FirebaseUser";
 import { FirebaseContext } from "../firebase/firebase";
 import { Redirect } from "react-router-dom";
-import { useAuthState } from "../firebase/firebase-hooks";
-const Menu = ({ history }) => {
+//import { useAuthState } from "../firebase/firebase-hooks";
+const Menu = () => {
   const context = useContext(AppContext);
   const user = useContext(UserContext);
   const firebase = useContext(FirebaseContext);
@@ -19,17 +19,9 @@ const Menu = ({ history }) => {
       </li>
       {!user && (
         <li className="link">
-          <a
-            href="#"
-            onClick={e => {
-              e.preventDefault();
-              firebase.auth
-                .signInWithPopup(firebase.googleProvider)
-                .then(u => {});
-            }}
-          >
+          <NavLink tabIndex="3" exact activeClassName="active" to="/signin">
             Sign In
-          </a>
+          </NavLink>
         </li>
       )}
 
@@ -45,6 +37,7 @@ const Menu = ({ history }) => {
           <a
             href="#"
             onClick={e => {
+              e.preventDefault();
               firebase.signOut();
               setSignOut(1);
             }}
