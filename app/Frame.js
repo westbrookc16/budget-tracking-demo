@@ -1,8 +1,9 @@
 import React, { useContext, lazy, Suspense } from "react";
+import { useUser } from "reactfire";
 import { AppContext } from "./context/AppContext";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useMediaPredicate } from "react-media-hook";
-import { UserContext } from "./firebase/FirebaseUser";
+
 const Home = lazy(() => import("./view-components/Home"));
 const Signin = lazy(() => import("./view-components/Signin"));
 const Budget = lazy(() => import("./view-components/Budget"));
@@ -17,7 +18,7 @@ const Frame = () => {
   const context = useContext(AppContext);
   const isMedium = useMediaPredicate("(min-width: 600px)");
   const breakpoint = isMedium ? "medium" : "small";
-  const user = useContext(UserContext);
+  const user = useUser();
   return (
     <BrowserRouter>
       <div className={`app-container ${breakpoint} ${context.themeMode}`}>

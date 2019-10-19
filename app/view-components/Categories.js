@@ -1,35 +1,22 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { formatMoney } from "../utils/numbers";
-import { FirebaseContext } from "../firebase/firebase";
+import { useFirebaseApp } from "reactfire";
 import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
-import {
-  NumericTextBox,
-  MaskedTextBox,
-  Input,
-  Switch,
-  Slider,
-  ColorGradient,
-  ColorPalette,
-  ColorPicker
-} from "@progress/kendo-react-inputs";
-import {
-  AutoComplete,
-  ComboBox,
-  DropDownList,
-  MultiSelect
-} from "@progress/kendo-react-dropdowns";
-
+import { NumericTextBox, Input } from "@progress/kendo-react-inputs";
+import "firebase/firestore";
+import PropTypes from "prop-types";
 const Categories = ({ budgetID, setTotalSpent }) => {
   const [categories, setCategories] = useState([]);
-  const firebase = useContext(FirebaseContext);
+  const firebase = useFirebaseApp();
   //variables for new category addition
   const [name, setName] = useState("");
   const [amount, setAmount] = useState(0);
   useEffect(() => {
     async function getCategories() {
       try {
-        const data = await firebase.db
+        const data = await firebase
+          .firestore()
           .collection("categories")
           .where("budgetID", "==", budgetID)
           .get();
@@ -44,12 +31,12 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       }
     }
     getCategories();
-  }, [firebase.db, budgetID]);
+  }, [firebase, budgetID]);
 
   //calculate total spent per month when categories changes
   useEffect(() => {
     const total = categories.reduce(
-      (accumulator, c, i) => accumulator + parseFloat(c.amount),
+      (accumulator, c) => accumulator + parseFloat(c.amount),
       0
     );
     setTotalSpent(formatMoney(total, 2, ".", ","));
@@ -58,11 +45,12 @@ const Categories = ({ budgetID, setTotalSpent }) => {
   const removeCat = dataItem => {
     const { id, name } = dataItem;
     if (confirm(`are you dsure you want to remove ${name}?`)) {
-      firebase.db
+      firebase
+        .firestore()
         .collection("categories")
         .doc(id)
         .delete()
-        .then(u => {
+        .then(() => {
           setCategories(c => {
             return c.filter(value => value.id !== id);
           });
@@ -115,11 +103,12 @@ const Categories = ({ budgetID, setTotalSpent }) => {
           }}
         />
         <Button
-          primary="true"
+          primary={true}
           onClick={e => {
             e.preventDefault();
             const budget = { name, amount, budgetID };
-            firebase.db
+            firebase
+              .firestore()
               .collection("categories")
               .add(budget)
               .then(doc => {
@@ -136,5 +125,10 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       </form>
     </div>
   );
+};
+Categories.propTypes = {
+  budgetID: PropTypes.string,
+  setTotalSpent: PropTypes.func,
+  dataItem: PropTypes.object
 };
 export default Categories;

@@ -1,27 +1,14 @@
-import React, { useCallback, useState, useContext, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Alert from "@reach/alert";
 import { formatMoney } from "../utils/numbers";
 import { Button } from "@progress/kendo-react-buttons";
-import {
-  NumericTextBox,
-  MaskedTextBox,
-  Input,
-  Switch,
-  Slider,
-  ColorGradient,
-  ColorPalette,
-  ColorPicker
-} from "@progress/kendo-react-inputs";
-import {
-  AutoComplete,
-  ComboBox,
-  DropDownList,
-  MultiSelect
-} from "@progress/kendo-react-dropdowns";
-import { UserContext } from "../firebase/FirebaseUser";
-import { FirebaseContext } from "../firebase/firebase";
+import { NumericTextBox } from "@progress/kendo-react-inputs";
+import { DropDownList } from "@progress/kendo-react-dropdowns";
+
+import { useFirebaseApp, useUser } from "reactfire";
+import "firebase/firestore";
 import Categories from "./Categories";
-const Budget = props => {
+const Budget = () => {
   document.title = "Budget Management";
   const years = ["2019", "2020", "2021"];
   const months = [
@@ -38,8 +25,8 @@ const Budget = props => {
     { text: "Nov", value: 11 },
     { text: "Dec", value: 12 }
   ];
-  const user = useContext(UserContext);
-  const firebase = useContext(FirebaseContext);
+  const user = useUser();
+  const firebase = useFirebaseApp();
 
   const [month, setMonth] = useState({ value: 10 });
   const [year, setYear] = useState("2019");
@@ -75,7 +62,8 @@ const Budget = props => {
         income,
         month: month.value
       };
-      await firebase.db
+      await firebase
+        .firestore()
         .collection("budgets")
         .doc(`${user.uid}${year}${month.value}`)
         .set(budget);
@@ -86,7 +74,8 @@ const Budget = props => {
   useEffect(() => {
     async function getBudget() {
       if (!user.uid) return;
-      const doc = await firebase.db
+      const doc = await firebase
+        .firestore()
         .collection("budgets")
         .doc(`${user.uid}${year}${month.value}`)
         .get();
@@ -99,7 +88,7 @@ const Budget = props => {
       }
     }
     getBudget();
-  }, [month, year, user, firebase.db]);
+  }, [month, year, user, firebase]);
 
   return (
     <div>
@@ -142,6 +131,7 @@ const Budget = props => {
       <Button
         primary={true}
         onClick={e => {
+          e.preventDefault();
           setBudget();
           setAlert(`Your budget was saved successfully.`);
           //alert("budget set successfully");
