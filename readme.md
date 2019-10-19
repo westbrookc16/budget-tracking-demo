@@ -1,0 +1,1 @@
+Just a demo for me to learn. Thanks so much to Eric Bishard for helping me out and for the great folks at Telerik (now Progress) for producing Kendo React. You should check it out if you need a great UI library that is mostly accessible. This project is based on the starter project at https://github.com/httpJunkie/2019-devreach-react-workshop
