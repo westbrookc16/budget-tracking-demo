@@ -57,6 +57,7 @@
     "react-dom": "^16.9.0",
     "react-firebaseui": "^4.0.0",
     "react-media-hook": "^0.4.4",
-    "react-router-dom": "^5.0.1"
+    "react-router-dom": "^5.0.1",
+    "reactfire": "^2.0.0-canary.803159c"
   }
 }

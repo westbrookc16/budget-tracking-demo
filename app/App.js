@@ -6,16 +6,17 @@ import "./App.scss";
 
 import { AppProvider } from "./context/AppContext";
 import Frame from "./Frame";
-import { FirebaseProvider } from "./firebase/firebase";
-import { FirebaseUser } from "./firebase/FirebaseUser";
+import { FirebaseAppProvider, SuspenseWithPerf } from "reactfire";
+import "firebase/performance";
+import { config } from "./firebase/config";
 const App = () => {
   return (
     <AppProvider>
-      <FirebaseProvider>
-        <FirebaseUser>
+      <FirebaseAppProvider firebaseConfig={config} initPerformance>
+        <SuspenseWithPerf fallback={`Loading...`}>
           <Frame />
-        </FirebaseUser>
-      </FirebaseProvider>
+        </SuspenseWithPerf>
+      </FirebaseAppProvider>
     </AppProvider>
   );
 };

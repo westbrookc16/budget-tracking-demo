@@ -1,14 +1,16 @@
 import React, { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-import { UserContext } from "../firebase/FirebaseUser";
-import { FirebaseContext } from "../firebase/firebase";
+
 import { Redirect } from "react-router-dom";
+import { useFirebaseApp, useUser } from "reactfire";
+import "firebase/auth";
 //import { useAuthState } from "../firebase/firebase-hooks";
+
 const Menu = () => {
   const context = useContext(AppContext);
-  const user = useContext(UserContext);
-  const firebase = useContext(FirebaseContext);
+  const user = useUser();
+  const firebase = useFirebaseApp();
   const [signOutState, setSignOut] = useState(0);
   return (
     <ul>
@@ -38,7 +40,7 @@ const Menu = () => {
             href="#"
             onClick={e => {
               e.preventDefault();
-              firebase.signOut();
+              firebase.auth().signOut();
               setSignOut(1);
             }}
           >
