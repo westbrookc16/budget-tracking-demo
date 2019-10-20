@@ -49,7 +49,7 @@ const AddTransaction = ({ budgetID, defaultCategory }) => {
     name: "",
     amount: 0,
     date: new Date(),
-    category: defaultCategory
+    category: { ...defaultCategory }
   };
   const [form, setForm] = useState(defaultForm);
   const handleChange = e => {
