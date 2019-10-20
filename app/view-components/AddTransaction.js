@@ -26,7 +26,8 @@ const AddTransaction = ({ budgetID, defaultCategory }) => {
       const catListRef = firebase
         .firestore()
         .collection("categories")
-        .where("budgetID", "==", budgetID);
+        .where("budgetID", "==", budgetID)
+        .orderBy("name");
       try {
         const catListDoc = await catListRef.get();
         let tempCats = [];
