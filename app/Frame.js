@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useMediaPredicate } from "react-media-hook";
 
 const Home = lazy(() => import("./view-components/Home"));
+const Transactions = lazy(() => import("./view-components/Transactions"));
 const Signin = lazy(() => import("./view-components/Signin"));
 const Budget = lazy(() => import("./view-components/Budget"));
 const LoadingMessage = () => `loading...`;
@@ -32,6 +33,10 @@ const Frame = () => {
             <Switch>
               <Suspense fallback={<LoadingMessage />}>
                 <Route exact path="/" component={Home} />
+                <Route
+                  path="/transactions/:categoryID/:budgetID"
+                  component={Transactions}
+                />
 
                 <Route exact path="/budget" component={Budget} />
                 <Route exact path="/signin" component={Signin} />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import { formatMoney } from "../utils/numbers";
 import { useFirebaseApp } from "reactfire";
 import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
@@ -64,21 +65,35 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       budgeted matches your total spent.
       <Grid style={{ height: "400px" }} data={categories}>
         <Column field="name" title="Name" width="40px" />
-        <Column field="amount" title="amount" width="40px" />
+        <Column field="amount" title="amount" width="40px" format="{0:c2}" />
         <Column
           title="Delete"
           cell={props => {
             const { dataItem } = props;
             return (
               <td>
-                <button
+                <Button
                   onClick={e => {
                     e.preventDefault();
                     removeCat(dataItem);
                   }}
                 >
                   Remove
-                </button>
+                </Button>
+              </td>
+            );
+          }}
+        ></Column>
+        <Column
+          title="View Transactions"
+          cell={props => {
+            const { dataItem } = props;
+            console.log("dataItem: ", dataItem);
+            return (
+              <td>
+                <NavLink to={`transactions/${dataItem.id}/${budgetID}`}>
+                  View Transactions
+                </NavLink>
               </td>
             );
           }}

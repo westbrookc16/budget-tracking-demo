@@ -43,7 +43,7 @@ const Budget = () => {
   const setTotalSpentAndAlert = useCallback(
     e => {
       setTotalSpent(e);
-      console.log(`e = ${e}`);
+
       setAlert(
         `There is ${formatMoney(
           parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
@@ -81,7 +81,7 @@ const Budget = () => {
         .get();
       if (doc.exists) {
         const data = doc.data();
-        console.log(`income=${data.income}`);
+
         setIncome(data.income);
       } else {
         setIncome(0);
@@ -94,8 +94,8 @@ const Budget = () => {
     <div>
       <h1>Budget Management</h1>
       <p>
-        <label htmlFor="ddlMonth">Month</label>
         <DropDownList
+          label="Month"
           data={months}
           textField="text"
           dataItemKey="value"
@@ -108,8 +108,8 @@ const Budget = () => {
         />
       </p>
       <p>
-        <label htmlFor="ddlYear">Year</label>
         <DropDownList
+          label="Year"
           data={years}
           value={year}
           onChange={e => {

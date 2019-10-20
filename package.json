@@ -42,7 +42,7 @@
   "dependencies": {
     "@progress/kendo-data-query": "^1.5.2",
     "@progress/kendo-drawing": "^1.6.0",
-    "@progress/kendo-react-buttons": "^3.4.1",
+    "@progress/kendo-react-buttons": "^3.6.0",
     "@progress/kendo-react-dateinputs": "^3.4.1",
     "@progress/kendo-react-dropdowns": "^3.4.1",
     "@progress/kendo-react-grid": "^3.4.1",
