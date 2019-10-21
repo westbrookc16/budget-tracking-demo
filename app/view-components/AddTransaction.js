@@ -49,15 +49,22 @@ const AddTransaction = ({ budgetID, defaultCategory }) => {
     name: "",
     amount: 0,
     date: new Date(),
-    category: { ...defaultCategory }
+    category: {}
   };
   const [form, setForm] = useState(defaultForm);
+  //this affect sets the default category when that prop changes
+  useEffect(() => {
+    setForm(f => {
+      return { ...f, category: { ...defaultCategory } };
+    });
+  }, [defaultCategory]);
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(f => {
       return { ...f, [name]: value };
     });
   };
+
   const { name, amount, date, category } = form;
   return (
     <div>

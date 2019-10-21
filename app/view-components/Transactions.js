@@ -16,7 +16,7 @@ const Transactions = () => {
         .collection("categories")
         .doc(categoryID)
         .get();
-      setCategory({ id: categoryID, ...catDoc.data() });
+      setCategory({ id: catDoc.id, ...catDoc.data() });
       document.title = `Transactions for ${catDoc.data().name}`;
     }
     getCategory();
