@@ -88,7 +88,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
           title="View Transactions"
           cell={props => {
             const { dataItem } = props;
-            console.log("dataItem: ", dataItem);
+
             return (
               <td>
                 <NavLink to={`transactions/${dataItem.id}/${budgetID}`}>
