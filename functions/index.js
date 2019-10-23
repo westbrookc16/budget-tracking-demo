@@ -9,13 +9,17 @@ const db = admin.firestore();
 
 exports.categoryUpdate = functions.firestore
   .document("/transactions/{id}")
-  .onWrite((snapshot, context) => {
+  .onCreate(async (snapshot, context) => {
     const data = snapshot.data();
-    const { categoryID, amount } = data;
-    return db
+    const { amount } = data;
+    const categoryID = data.category.id;
+    console.log(`amount=${amount}`);
+    const catDoc = await db
       .collection("categories")
       .doc(categoryID)
-      .update({ totalSpent: totalSpent + amount });
+      .get();
+    const catData = catDoc.data();
+    catDoc.ref.update({ totalSpent: catData.totalSpent + parseFloat(amount) });
   });
 exports.calcTotals = functions.https.onCall(async () => {
   const catSnap = await db.collection("categories").get();
