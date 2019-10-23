@@ -16,7 +16,7 @@ const AddTransaction = ({ budgetID, defaultCategory }) => {
         .firestore()
         .collection("transactions")
         .add(form);
-      setForm(defaultForm);
+      setForm({ ...defaultForm, category: { ...defaultCategory } });
     } catch (e) {
       console.table(e);
     }

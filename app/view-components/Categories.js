@@ -16,17 +16,18 @@ const Categories = ({ budgetID, setTotalSpent }) => {
   useEffect(() => {
     async function getCategories() {
       try {
-        const data = await firebase
+        return await firebase
           .firestore()
           .collection("categories")
           .where("budgetID", "==", budgetID)
-          .get();
-        let tempCats = [];
-        data.forEach(doc => {
-          tempCats = [...tempCats, { id: doc.id, ...doc.data() }];
-        });
+          .onSnapshot(catSnap => {
+            let tempCats = [];
+            catSnap.forEach(doc => {
+              tempCats = [...tempCats, { id: doc.id, ...doc.data() }];
+            });
 
-        setCategories(tempCats);
+            setCategories(tempCats);
+          });
       } catch (e) {
         console.table(e);
       }
@@ -66,6 +67,12 @@ const Categories = ({ budgetID, setTotalSpent }) => {
       <Grid style={{ height: "400px" }} data={categories}>
         <Column field="name" title="Name" width="40px" />
         <Column field="amount" title="amount" width="40px" format="{0:c2}" />
+        <Column
+          field="totalSpent"
+          title="Total Spent"
+          width="40px"
+          format="{0:c2}"
+        />
         <Column
           title="Delete"
           cell={props => {
