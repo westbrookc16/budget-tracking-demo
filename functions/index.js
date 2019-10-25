@@ -10,16 +10,30 @@ const db = admin.firestore();
 exports.categoryUpdate = functions.firestore
   .document("/transactions/{id}")
   .onCreate(async (snapshot, context) => {
+    console.log("hi");
     const data = snapshot.data();
     const { amount } = data;
     const categoryID = data.category.id;
-    console.log(`amount=${amount}`);
+
     const catDoc = await db
       .collection("categories")
       .doc(categoryID)
       .get();
     const catData = catDoc.data();
     catDoc.ref.update({ totalSpent: catData.totalSpent + parseFloat(amount) });
+  });
+exports.transDelete = functions.firestore
+  .document("/transactions/{id}")
+  .onDelete(async snapshot => {
+    console.log("hey I'm here.");
+    const data = snapshot.data();
+    const catDoc = await db
+      .collection("categories")
+      .doc(data.category.id)
+      .get();
+    const catData = catDoc.data();
+    const { amount } = data;
+    catDoc.ref.update({ totalSpent: catData.totalSpent - amount });
   });
 exports.calcTotals = functions.https.onCall(async () => {
   const catSnap = await db.collection("categories").get();
@@ -29,7 +43,6 @@ exports.calcTotals = functions.https.onCall(async () => {
     .get();
   catSnap.docs.forEach(catDoc => {
     const id = catDoc.id;
-    console.log(`id=${id}`);
 
     //docs always seems no be undefined always. why?
 
@@ -40,7 +53,7 @@ exports.calcTotals = functions.https.onCall(async () => {
       else return total;
       //return total + (data.category.id === id) ? parseFloat(data.amount) : 0;
     }, 0);
-    console.log(`totalSpent=${totalSpent}`);
+
     catDoc.ref.update({ totalSpent: totalSpent });
   });
   return {};
