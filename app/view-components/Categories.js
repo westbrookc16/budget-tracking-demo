@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { formatMoney } from "../utils/numbers";
+
 import { useFirebaseApp } from "reactfire";
 import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
 import { Button } from "@progress/kendo-react-buttons";
 import { NumericTextBox, Input } from "@progress/kendo-react-inputs";
 import "firebase/firestore";
 import PropTypes from "prop-types";
-const Categories = ({ budgetID, setTotalSpent }) => {
+const Categories = ({ budgetID }) => {
   const [categories, setCategories] = useState([]);
   const firebase = useFirebaseApp();
   //variables for new category addition
@@ -36,13 +36,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
   }, [firebase, budgetID]);
 
   //calculate total spent per month when categories changes
-  useEffect(() => {
-    const total = categories.reduce(
-      (accumulator, c) => accumulator + parseFloat(c.amount),
-      0
-    );
-    setTotalSpent(formatMoney(total, 2, ".", ","));
-  }, [setTotalSpent, categories]);
+
   //deleting of categories
   const removeCat = dataItem => {
     const { id, name } = dataItem;

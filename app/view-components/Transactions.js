@@ -13,13 +13,14 @@ const Transactions = () => {
   const [category, setCategory] = useState({});
   useEffect(() => {
     async function getCategory() {
-      const catDoc = await firebase
+      return await firebase
         .firestore()
         .collection("categories")
         .doc(categoryID)
-        .get();
-      setCategory({ id: catDoc.id, ...catDoc.data() });
-      document.title = `Transactions for ${catDoc.data().name}`;
+        .onSnapshot(catDoc => {
+          setCategory({ id: catDoc.id, ...catDoc.data() });
+          document.title = `Transactions for ${catDoc.data().name}`;
+        });
     }
     getCategory();
   }, [firebase, categoryID]);
@@ -37,7 +38,7 @@ const Transactions = () => {
   };
   const firebase = useFirebaseApp();
   const [transactions, setTransactions] = useState([]);
-  const [totalSpent, setTotalSpent] = useState(0);
+
   useEffect(() => {
     const transCollection = firebase
       .firestore()
@@ -45,10 +46,7 @@ const Transactions = () => {
       .where("category.id", "==", categoryID);
     return transCollection.onSnapshot(snapShot => {
       //calculate totals
-      let total = snapShot.docs.reduce((total, doc) => {
-        return total + parseFloat(doc.data().amount);
-      }, 0);
-      setTotalSpent(total);
+
       setTransactions(
         snapShot.docs.map(doc => {
           return { id: doc.id, ...doc.data(), date: doc.data().date.toDate() };
@@ -87,7 +85,7 @@ const Transactions = () => {
       <h1>Status</h1>
       <ul>
         <li>Total Budgeted: {formatMoney(category.amount)}</li>
-        <li>Total Spent: {formatMoney(totalSpent)}</li>
+        <li>Total Spent: {formatMoney(category.totalSpent)}</li>
       </ul>
     </div>
   );

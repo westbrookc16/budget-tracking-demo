@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Alert from "@reach/alert";
 import { useParams, useHistory } from "react-router-dom";
 import { formatMoney } from "../utils/numbers";
@@ -36,7 +36,7 @@ const Budget = () => {
   });
   const [year, setYear] = useState(!params.year ? 2019 : params.year);
   const [income, setIncome] = useState(0);
-  const [totalSpent, setTotalSpent] = useState(0);
+  const [totalBudgeted, setTotalBudgeted] = useState(0);
   const [msg, setMsg] = useState("");
   const setAlert = alert => {
     setMsg(alert);
@@ -45,21 +45,7 @@ const Budget = () => {
       setMsg("");
     }, 5000);
   };
-  const setTotalSpentAndAlert = useCallback(
-    e => {
-      setTotalSpent(e);
 
-      setAlert(
-        `There is ${formatMoney(
-          parseFloat(income) - parseFloat(e.replace(",", "").replace("$", "")),
-          2,
-          ".",
-          ","
-        )} left to budget.`
-      );
-    },
-    [setTotalSpent, income]
-  );
   async function setBudget() {
     try {
       const budget = {
@@ -71,7 +57,7 @@ const Budget = () => {
         .firestore()
         .collection("budgets")
         .doc(`${user.uid}${year}${month.value}`)
-        .set(budget);
+        .set(budget, { merge: true });
     } catch (e) {
       console.table(e);
     }
@@ -79,27 +65,33 @@ const Budget = () => {
   useEffect(() => {
     async function getBudget() {
       if (!user.uid) return;
-      const doc = await firebase
+      return await firebase
         .firestore()
         .collection("budgets")
         .doc(`${user.uid}${year}${month.value}`)
-        .get();
-      if (doc.exists) {
-        const data = doc.data();
+        .onSnapshot(doc => {
+          if (doc.exists) {
+            const data = doc.data();
 
-        setIncome(data.income);
-      } else {
-        setIncome(0);
-      }
+            setIncome(data.income);
+            setTotalBudgeted(data.totalBudgeted);
+          } else {
+            setIncome(0);
+            setTotalBudgeted(0);
+          }
+        });
     }
     getBudget();
   }, [month, year, user, firebase]);
   //set month and year if params change
   useEffect(() => {
-    console.log(`In effect`);
     setMonth({ value: parseInt(params.month) });
     setYear(params.year);
   }, [params]);
+  useEffect(() => {
+    const totalLeft = parseFloat(income) - parseFloat(totalBudgeted);
+    setAlert(`There is ${formatMoney(totalLeft, 2, ".", ",")} left to budget.`);
+  }, [totalBudgeted, income]);
   return (
     <div>
       <h1>Budget Management</h1>
@@ -142,20 +134,15 @@ const Budget = () => {
         onClick={e => {
           e.preventDefault();
           setBudget();
-          setAlert(`Your budget was saved successfully.`);
-          //alert("budget set successfully");
         }}
       >
         Save
       </Button>
-      <Categories
-        budgetID={`${user.uid}${year}${month.value}`}
-        setTotalSpent={setTotalSpentAndAlert}
-      />
+      <Categories budgetID={`${user.uid}${year}${month.value}`} />
       <h1>Status</h1>
       <ul>
         <li>Total Income: {formatMoney(income, 2, ".", ",")}</li>
-        <li>Total Spent: {totalSpent}</li>
+        <li>Total Spent: {formatMoney(totalBudgeted, 2, ".", ",")}</li>
       </ul>
       <Alert>{msg}</Alert>
     </div>
