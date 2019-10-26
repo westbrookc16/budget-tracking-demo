@@ -52,11 +52,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
         .collection("categories")
         .doc(id)
         .delete()
-        .then(() => {
-          setCategories(c => {
-            return c.filter(value => value.id !== id);
-          });
-        });
+        .then(() => {});
     }
   };
   return (
@@ -98,7 +94,7 @@ const Categories = ({ budgetID, setTotalSpent }) => {
 
             return (
               <td>
-                <NavLink to={`transactions/${dataItem.id}/${budgetID}`}>
+                <NavLink to={`/transactions/${dataItem.id}/${budgetID}`}>
                   View Transactions
                 </NavLink>
               </td>
@@ -128,17 +124,14 @@ const Categories = ({ budgetID, setTotalSpent }) => {
           primary={true}
           onClick={e => {
             e.preventDefault();
-            const budget = { name, amount, budgetID };
+            const budget = { name, amount, budgetID, totalSpent: 0 };
             firebase
               .firestore()
               .collection("categories")
               .add(budget)
-              .then(doc => {
+              .then(() => {
                 setName("");
                 setAmount(0);
-                setCategories(c => {
-                  return [...c, { id: doc.id, ...budget }];
-                });
               });
           }}
         >

@@ -29,7 +29,13 @@ const Menu = () => {
 
       {user && (
         <li className="link">
-          <NavLink tabIndex="3" exact activeClassName="active" to="/budget">
+          <NavLink
+            tabIndex="3"
+            exact
+            activeClassName="active"
+            to={`/budget/${new Date().getMonth() +
+              1}/${new Date().getFullYear()}`}
+          >
             Budget Management
           </NavLink>
         </li>

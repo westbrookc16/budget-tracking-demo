@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
 import Alert from "@reach/alert";
+import { useParams, useHistory } from "react-router-dom";
 import { formatMoney } from "../utils/numbers";
 import { Button } from "@progress/kendo-react-buttons";
 import { NumericTextBox } from "@progress/kendo-react-inputs";
@@ -26,10 +27,14 @@ const Budget = () => {
     { text: "Dec", value: 12 }
   ];
   const user = useUser();
+  const params = useParams();
+  const history = useHistory();
   const firebase = useFirebaseApp();
 
-  const [month, setMonth] = useState({ value: 10 });
-  const [year, setYear] = useState("2019");
+  const [month, setMonth] = useState({
+    value: !params.month ? 10 : params.month
+  });
+  const [year, setYear] = useState(!params.year ? 2019 : params.year);
   const [income, setIncome] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
   const [msg, setMsg] = useState("");
@@ -89,7 +94,12 @@ const Budget = () => {
     }
     getBudget();
   }, [month, year, user, firebase]);
-
+  //set month and year if params change
+  useEffect(() => {
+    console.log(`In effect`);
+    setMonth({ value: parseInt(params.month) });
+    setYear(params.year);
+  }, [params]);
   return (
     <div>
       <h1>Budget Management</h1>
@@ -102,8 +112,7 @@ const Budget = () => {
           id="ddlMonth"
           value={month}
           onChange={e => {
-            setMonth(e.target.value);
-            //alert(month);
+            history.push(`/budget/${e.target.value.value}/${year}`);
           }}
         />
       </p>
@@ -113,7 +122,7 @@ const Budget = () => {
           data={years}
           value={year}
           onChange={e => {
-            setYear(e.target.value);
+            history.push(`/budget/${month.value}/${e.target.value}`);
           }}
         />
       </p>

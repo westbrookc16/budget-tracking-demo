@@ -39,6 +39,7 @@ const Frame = () => {
                 />
 
                 <Route exact path="/budget" component={Budget} />
+                <Route path="/budget/:month/:year" component={Budget} />
                 <Route exact path="/signin" component={Signin} />
               </Suspense>
               <Route render={() => <h2>404 Page Not Found</h2>} />
