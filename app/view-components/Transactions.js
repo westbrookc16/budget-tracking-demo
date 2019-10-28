@@ -63,8 +63,8 @@ const Transactions = () => {
         <Column title="Amount" field="amount" format="{0:c2}" />
         <Column
           title="Delete"
-          cell={props => {
-            const { dataItem } = props;
+          cell={p => {
+            const { dataItem } = p;
             return (
               <td>
                 <Button
